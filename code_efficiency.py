@@ -41,13 +41,13 @@ def main():
     canvas.grid(rowspan=2)
 
     # sets up the initial display, performs the rest of the functions
-    draw_startup(root)
+    draw_startup(root, canvas)
 
     # runs the program on a tkinter interface until the page is closed
     root.mainloop()
 
 
-def draw_startup(root):
+def draw_startup(root, canvas):
     """ Lays out the startup page and sets up the interactible
     parts of the program. the parameter 'root' is the open page
     and 'canvas' is the interface tied to tkinter & its functions.
@@ -68,12 +68,12 @@ def draw_startup(root):
     button_text = tk.StringVar() # makes the button text modifiable
     file_search = tk.Button(root, textvariable=button_text,
             font=("Helvetica", "24"), padx=10, pady=15, foreground="dodger blue",
-            command=lambda:process_file(root, button_text, tb_text))
+            command=lambda:process_file(root, button_text, tb_text, canvas))
     button_text.set("Browse")
     file_search.grid(column=0, row=1) # centers the text on the 2nd row
 
 
-def process_file(root, button_text, tb_text):
+def process_file(root, button_text, tb_text, canvas):
     """ Activated by the button on the lower half of the
     interface. Allows the user to search in the finder for
     a .py file, calls the function 'strip_code()', then
@@ -96,16 +96,19 @@ def process_file(root, button_text, tb_text):
         UNCOMMENT THE FOLLOWING LINE. """
         # print(f"total: {total_lines}\nexecutable: {exec_lines}")
 
+        # refresh(canvas)
+
         # changes the screen to display the final information
         write_results(total_lines, exec_lines, tb_text)
-
-        button_text.set("Try another file") # pressing the button will repeat with another file
  
     except ZeroDivisionError:
         """ If the function tries to divide a number by zero, that means
         the total amount of lines is 0, making it a blank file.
         """
-        tb_text.set("The file you chose is blank.")
+        tb_text.set("The file you chose is blank.\n\nPlease try again!")
+
+    finally:
+        button_text.set("Try another file") # pressing the button will repeat with another file
 
 
 def strip_code(py_file):
@@ -215,6 +218,11 @@ def write_results(total_lines, executable_lines, tb_text):
     # will redisplay for every code run through the program
     tb_text.set(f"Your code has a total\nof {total_lines} lines, but\nonly {executable_lines} "
             f"are run\nby the computer!\n\nThat's only {exec_percent:.1f}%!" + msg)
+
+
+def refresh(self):
+    self.destroy()
+    self.__init__()
 
 
 # calls the function main() and starts the program
